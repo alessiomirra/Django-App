@@ -40,6 +40,13 @@ def update_progress(self):
 
 This method retrieves all tasks related to a field, checks the number of tasks completed, then it calculates the progress value as a percentage. 
 The "progress" field for Project model is automatically uploaded. 
+The field is automatically updated using a signal: when a Task is created or updated, the signal is automatically called and it updates the related Project's "progress" field, calling the update_progress method defined in the Project model: 
+
+```python
+@receiver(post_save, sender=Task)
+def update_project_progress(sender, instance, **kwags):
+    instance.project.update_progress() 
+```
 
 The views for this model have been written using class-based views 
 
