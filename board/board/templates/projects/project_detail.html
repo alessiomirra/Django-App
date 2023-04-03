@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ block.super }} - {{ object.title }}{% endblock title %}
+
+{% block content %}
+
+    <div class="container mt-2 mb-2">
+
+        <div class="d-flex justify-content-between">
+            <div>
+                <h4>{{ object.title }}</h4>
+
+                {% if object.finish_date %}
+                    <p>
+                        <span class="text-muted">Finish Date: </span><span class="text-decoration-underline">{{ object.finish_date }}</span>
+                    </p>
+                {% endif %}
+
+                <div>
+                    {% if object.progress >= 0 and object.progress <= 20 %}
+                        <p>
+                            <span class="text-muted">Progress: </span><span class="text-danger">{{ object.progress }} %</span>
+                        </p>
+                    {% elif object.progress >= 21 and object.progress <= 99 %}
+                        <p>
+                            <span class="text-muted">Progress: </span><span class="text-primary">{{ object.progress }} %</span>
+                        </p>
+                    {% else %}
+                        <p>
+                            <span class="text-muted">Progress: </span><span class="text-success">{{ object.progress }} %</span>
+                        </p>
+                    {% endif %}
+                </div>
+
+                {% if object.created_by == request.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-white dropdown-toggle border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'edit' object.id %}">Update</a></li>
+                        <li><a class="dropdown-item" href="{% url 'delete' object.id %}">Delete</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+
+            </div>
+            <div>
+                <p class="text-muted ms-auto">{{ object.created_by }}</p>
+                <p>
+                    <span class="text-muted">Created On: </span><span class="text-decoration-underline">{{ object.date }}</span>
+                </p>
+            </div>
+        </div>    
+
+        <hr>
+
+        <h5 class="text-decoration-underline">Project Description</h5>
+
+        <p>{{ object.description }}</p>
+
+        <hr>
+
+        <div class="d-flex justify-content-between">
+            <h6 class="text-decoration-underline">{{ object.task_set.all | length }} Task{{ object.task_set.all | pluralize }}</h6>
+            <div>
+                <a href="{% url 'create-task' object.id %}" class="btn btn-sm btn-outline-primary">+ Add Task</a>
+            </div>
+        </div>
+
+        {% if object.task_set.all %}
+            <ul class="list-group mt-3">
+                {% for task in object.task_set.all %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if task.progress == "completed" %}
+                                    <a class="text-decoration-line-through" href="{{ task.get_absolute_url }}">{{ task.title }}</a>, {{ task.created_by }} <br>
+                                    <span>Created: {{ task.date }}</span>
+                                {% else %}
+                                    <a href="{{ task.get_absolute_url }}">{{ task.title }}</a>, {{ task.created_by }} <br>
+                                    <span>Created: {{ task.date }}</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if task.progress == "completed" %}
+                                    <p class="text-success">{{ task.progress }}</p>
+                                {% else %}
+                                    <p class="text-danger">{{ task.progress }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <hr>
+
+        <a href="{% url 'project_content_list' object.id %}" class="btn btn-sm btn-primary">CONTENTS</a>
+
+        <hr>
+        
+        <div class="mb-5">
+            <h6 class="text-decoration-underline">COMMENTS SECTION</h6>
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-sm btn-primary ms-auto">Add Comment</button>
+            </form>
+        </div>
+
+        {% for comment in object.project_comments.all %}
+            <div class="alert alert-secondary">
+                <p>{{ comment.text }}</p>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="fs-6 text-muted">{{ comment.created_by.username }} <span class="ms-4">{{ comment.date }}</span></p>
+                    </div>
+                    <div>
+                        {% if comment.created_by == request.user %}
+                            <form method="POST" action="{% url 'comment-delete' comment.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Delete Comment</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No comments for this project</p>
+        {% endfor %}
+
+
+        <hr>
+    </div>
+
+{% endblock content %}

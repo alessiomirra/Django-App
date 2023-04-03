@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ block.super }} - {{ object.title }}{% endblock title %}
+
+{% block content %}
+
+    <div class="container mt-2 mb-2">
+
+        <div class="d-flex justify-content-between">
+            <div>
+                <h4>{{ object.title }}  <span class="text-muted fs-6">#{{ object.tags }}</span></h4>
+                <h6><span>Project:</span> <span class="text-decoration-underline"><a href="{{ object.project.get_absolute_url }}">{{ object.project.title }}</a></span></h6>
+                {% if object.finish_date %}
+                    <p>
+                        <span class="text-muted">Finish Date: </span><span class="text-decoration-underline">{{ object.finish_date }}</span>
+                    </p>
+                {% endif %}
+                <div>
+                    {% if object.progress == "completed" %}
+                        <p class="text-success">{{ object.progress }}</p>
+                    {% else %}
+                        <p class="text-danger">{{ object.progress }}</p>
+                    {% endif %}
+                </div>
+                {% if object.created_by == request.user or object.project.created_by == request.user %}
+                    <div class="dropdown">
+                        <button class="btn btn-white dropdown-toggle border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'edit-task' pk=object.project.id task_pk=object.id %}">Update</a></li>
+                            <li><a class="dropdown-item" href="{% url 't-delete' object.id %}">Delete</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                <p class="text-muted ms-auto">{{ object.created_by }}</p>
+                <p>
+                    <span class="text-muted">Created On: </span><span class="text-decoration-underline">{{ object.date }}</span>
+                </p>
+            </div>
+        </div>
+
+        <hr>
+
+        <h5 class="text-decoration-underline">Task Description</h5>
+
+        <p>{{ task.description }}</p>
+
+
+
+    </div>
+
+{% endblock content %}

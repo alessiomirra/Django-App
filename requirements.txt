@@ -1,0 +1,11 @@
+attrs==22.2.0
+Django==4.1.7
+django-allauth==0.53.1
+django-redisboard==8.4.0
+django-widget-tweaks==1.4.12
+djangorestframework==3.14.0
+drf-yasg==1.21.5
+oauthlib==3.2.2
+Pillow==9.4.0
+python3-openid==3.2.0
+redis==4.5.4

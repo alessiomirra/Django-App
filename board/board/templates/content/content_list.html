@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ block.super }} - {{ project.title }} - Content{% endblock title %}
+
+{% block content %}
+
+    <div class="container mt-2 mb-2">
+
+        <h4 class="text-decoration-underline">{{ project.title }} - Contents</h4>
+
+        {% if request.user == project.created_by %}
+
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+                    <a class="btn btn-sm btn-primary me-2" href="{% url 'project_content_create' project.id  %}">Create</a>
+                </li>
+            </ul>
+
+        {% endif %}
+
+        <hr>
+
+        <table class="table">
+            <tbody>
+                {% for content in project.project_contents.all %}
+                    <th scope="col">{{ content.title }}</th>
+                    <td scope="col"><a href="{{ content.file.url }}">{{ content.file }}</a></td>
+                    <td scope="col" class="text-decoration-underline">{{ content.created_by }}</td>
+                    <td scope="col">{{ content.date }}</td>
+                    {% if content.created_by == request.user %}
+                        <th scope="col">
+                            <a href="{% url 'project_content_delete' project_id=project.id content_id=content.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </th>
+                    {% else %}
+                        <th scope="col"></th>
+                    {% endif %}
+                {% empty %}
+                        <p>No contents for this project yet</p>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock content %}
+

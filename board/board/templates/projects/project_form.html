@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% if object %}
+        {{ block.super }} - Edit "{{ object.title }}"
+    {% else %}
+        Create a New Project
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h3 class="mt-2 mb-2">
+            {% if object %}
+                {{ object.title }} - Edit 
+            {% else %}
+                Create a new Project 
+            {% endif %}
+        </h3>
+        
+        <hr>
+
+        <div class="form-container">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    {% render_field form.title class="form-control" id="floatingTitle" placeholder="Project Name" %}
+                    <label for="floatingTitle">Project Title</label>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Project Description</label>
+                    {% render_field form.description class="form-control" rows="10" cols="20" id="description" placeholder="Project Description" %}
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="finish_date" class="form-label">Finish Date</label>
+                        {% render_field form.finish_date class="form-control" id="finish_date" type="date" %}
+                    </div>
+                    <div class="col">
+                        <div class="form-check mt-5 ms-4">
+                            {% render_field form.private class="form-check-input" type="checkbox" id="flexCheckChecked" %}
+                            <label for="flexCheckChecked" class="form-check-label">Private</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">SAVE</button>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock content %}

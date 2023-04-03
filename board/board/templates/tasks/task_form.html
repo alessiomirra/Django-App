@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% if object %}
+        {{ block.super }} - Edit "{{ object.title }}"
+    {% else %}
+        {{ block.super }} - Add Task
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="mt-2 mb-2">
+
+            <h4>
+                {% if object %}
+                    {{ object.title }} - Edit 
+                {% else %}
+                    Add a Task
+                {% endif %}
+            </h4>
+
+            <h6>Project: <span class="text-decoration-underline">{{ project.title }}</span></h6>
+
+            <hr>
+
+            <div class="form-container">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-9">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Project Title</label>
+                                {% render_field form.title class="form-control" id="title" placeholder="Task Name" %}
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="progress" class="form-label">Progress</label>
+                            {% render_field form.progress class="form-control" id="progress" %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        {% render_field form.description class="form-control" rows="10" cols="20" id="description" %}
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="tags" class="form-label">Tag</label>
+                                {% render_field form.tags class="form-control" id="tags" %}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="finish_date" class="form-label">Finish Date</label>
+                                {% render_field form.finish_date class="form-control" id="finish_date" type="date" %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        
+
+    </div>
+
+{% endblock content %}

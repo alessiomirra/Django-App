@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <div class="mt-2 mb-2">
+        <h3>Hi, {{ request.user.username }}</h3>
+        {{ today }}
+    </div>
+
+    <hr>
+
+    {% for object in object_list %}
+
+        <div class="card mb-3">
+            <div class="container p-2">
+                <div class="d-flex justify-content-between">
+                    <h5>{{ object.title }}</h5>
+                    <div><a href="{% url 'detail' object.id %}" class="btn btn-sm btn-success">VIEW</a></div>
+                </div>
+                <hr>
+                <p>{{ object.description }}</p>
+                <div class="d-flex justify-content-between">
+                    <p><span class="text-muted">Finish Date:</span>
+                        {% if object.finish_date < today %}
+                            <span class="text-danger">{{ object.finish_date }}</span>
+                        {% else %}
+                            <span>{{ object.finish_date }}</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-muted">{{ object.task_set.all | length }} Task{{ object.tasks_set | pluralize }}</p>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        {% if object.progress >= 0 and object.progress <= 20 %}
+                            <p class="text-danger">{{ object.progress }} %</p>
+                        {% elif object.progress >= 21 and object.progress <= 99 %}
+                            <p class="text-primary">{{ object.progress }} %</p>
+                        {% else %}
+                            <p class="text-success">{{ object.progress }} %</p>
+                        {% endif %}
+                        <p>{{ object.created_by }}</p>
+                    </div>
+                    <div>
+                        <p>{{ object.date }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% empty %}
+        <div class="container text-center mt-3 mb-3">
+            <p>No projects available yet</p>
+        </div>
+    {% endfor %}
+    
+</div>
+{% endblock content %}
