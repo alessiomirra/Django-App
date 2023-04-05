@@ -138,7 +138,7 @@ Activate the environment and install all the Python/Django dependencies:
 
 ```bash
 source venv/bin/activate
-pip install -m ./requirements.txt
+pip install -r ./requirements.txt
 ```
 
 Run Django Development Server 
