@@ -147,6 +147,8 @@ Run Django Development Server
 python manage.py runserver 
 ```
 
+Install and set up Redis both on the your local machine and in the project
+
 ### Possible features
 
 1. Notification System
