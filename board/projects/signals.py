@@ -8,4 +8,3 @@ from .models import Task
 @receiver(post_save, sender=Task)
 def update_project_progress(sender, instance, **kwags):
     instance.project.update_progress() 
-

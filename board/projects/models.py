@@ -72,3 +72,11 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.created_by.username} for {self.project.title}"
 
+
+class ProjectMembership(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='users')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followed_projects")
+
+    def __str__(self):
+        return f"{self.user.username}, {self.project.title}"
+

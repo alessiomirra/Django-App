@@ -1,0 +1,23 @@
+{% extends 'live/live_base.html' %}
+
+{% block title %}{{ block.super }} - Room{% endblock title %}
+
+{% block content %}
+
+    <div class="container mt-2 mb-4">
+        <h4><a href="{{ project.get_absolute_url }}">{{ project.title }}</a> - <span class="text-muted">Chat Room</span></h4>
+        <h6><span class="text-muted">admin: </span>{{ project.created_by.username }}</h6>
+    </div>
+
+    <div class="container mt-2">
+
+        <div id="chat-log"></div>
+        <input type="text" size="100" id="chat-message-input" class="form-control mt-3">
+        <input type="button" id="chat-message-submit" class="btn btn-sm btn-primary mt-2" value="Send">
+
+    </div>
+
+    {{ project_id | json_script:"project-id" }}
+    {{ request.user.username | json_script:"request-user" }}
+
+{% endblock content %}

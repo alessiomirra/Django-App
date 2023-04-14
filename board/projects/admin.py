@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Task, Content, Comment 
+from .models import Project, Task, Content, Comment, ProjectMembership 
 # Register your models here.
 
 class TaskInline(admin.StackedInline):
@@ -14,3 +14,4 @@ class ProjectAdmin(admin.ModelAdmin):
     inlines = [ TaskInline, ContentInline ]
 
 admin.site.register(Comment)
+admin.site.register(ProjectMembership)

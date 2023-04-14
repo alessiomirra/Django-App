@@ -8,7 +8,7 @@
 
         <div class="d-flex justify-content-between">
             <div>
-                <h4>{{ object.title }}  <span class="text-muted fs-6">#{{ object.tags }}</span></h4>
+                <h4>{{ object.title }}  <span class="text-muted fs-6">{% if object.tags %}#{{ object.tags }}{% endif %}</span></h4>
                 <h6><span>Project:</span> <span class="text-decoration-underline"><a href="{{ object.project.get_absolute_url }}">{{ object.project.title }}</a></span></h6>
                 {% if object.finish_date %}
                     <p>
@@ -46,7 +46,7 @@
 
         <h5 class="text-decoration-underline">Task Description</h5>
 
-        <p>{{ task.description }}</p>
+        <p>{{ task.description|linebreaks }}</p>
 
 
 

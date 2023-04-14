@@ -42,6 +42,12 @@
                         <li><a class="dropdown-item" href="{% url 'delete' object.id %}">Delete</a></li>
                         </ul>
                     </div>
+                {% elif object.created_by != request.user %}
+                    {% if request.user in followers %}
+                        <a href="{% url 'leave_project' object.id %}" class="btn btn-sm btn-white border">Unfollow Project</a>
+                    {% else %}
+                        <a href="{% url 'join_project' object.id %}" class="btn btn-sm btn-white border">Follow Project</a>
+                    {% endif %}
                 {% endif %}
 
             </div>
@@ -55,9 +61,22 @@
 
         <hr>
 
+        {% if request.user == object.created_by or request.user in followers %}
+            <a href="{% url 'room' object.id %}">Chat Room</a>
+        {% endif %}
+        
+        <h6 class="mt-2">Members: {% for user in followers %}<span class="text-muted me-2">{{ user.username }}</span>{% endfor %}</h6>
+        <!--
+        {% for user in followers %}
+            <span class="text-muted me-3">{{ user.username }}</span>
+        {% endfor %}
+        -->
+
+        <hr>
+
         <h5 class="text-decoration-underline">Project Description</h5>
 
-        <p>{{ object.description }}</p>
+        <p>{{ object.description|linebreaks }}</p>
 
         <hr>
 
@@ -71,26 +90,41 @@
         {% if object.task_set.all %}
             <ul class="list-group mt-3">
                 {% for task in object.task_set.all %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                {% if task.progress == "completed" %}
-                                    <a class="text-decoration-line-through" href="{{ task.get_absolute_url }}">{{ task.title }}</a>, {{ task.created_by }} <br>
+                    {% if task.progress == "completed" %}
+                        <li class="list-group-item bg-secondary" style="--bs-bg-opacity: .5;">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="{{ task.get_absolute_url }}">{{ task.title }}</a>
+                                    {% if task.tags %}<span class="text-muted">#{{ task.tags }}</span>{% endif %}
                                     <span>Created: {{ task.date }}</span>
-                                {% else %}
-                                    <a href="{{ task.get_absolute_url }}">{{ task.title }}</a>, {{ task.created_by }} <br>
+                                </div>
+                                <div>
+                                    {% if task.progress == "completed" %}
+                                        <p class="text-success">{{ task.progress }}</p>
+                                    {% else %}
+                                        <p class="text-danger">{{ task.progress }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="{{ task.get_absolute_url }}">{{ task.title }}</a>
+                                    {% if task.tags %}<span class="text-muted">#{{ task.tags }}</span>{% endif %}
                                     <span>Created: {{ task.date }}</span>
-                                {% endif %}
+                                </div>
+                                <div>
+                                    {% if task.progress == "completed" %}
+                                        <p class="text-success">{{ task.progress }}</p>
+                                    {% else %}
+                                        <p class="text-danger">{{ task.progress }}</p>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div>
-                                {% if task.progress == "completed" %}
-                                    <p class="text-success">{{ task.progress }}</p>
-                                {% else %}
-                                    <p class="text-danger">{{ task.progress }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </li>
+                        </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         {% endif %}

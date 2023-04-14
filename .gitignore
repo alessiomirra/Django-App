@@ -111,3 +111,5 @@ core/__pycache__/
 board/projects/migrations/
 board/projects/__pycache__/ 
 board/projects/api/__pycache__/ 
+board/live/migrations/
+board/live/__pycache__/ 

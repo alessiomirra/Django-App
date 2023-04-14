@@ -1,6 +1,119 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div id="homepage-container">
+
+    <div id="user-side">
+        <div class="container">
+            <p class="text-muted mt-2">{{ today }}</p>
+
+            <div class="text-center mt-3">
+                <h3>Hi, {{ request.user.username }}</h3>
+                <hr>
+                <p class="text-muted">{{ request.user.projects.all | length }} Created Projects</p>
+                <p class="text-muted">{{ request.user.followed_projects.all | length }} Followed Projects</p>
+            </div>
+
+            <div class="dropdown mt-3 text-center">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Account settings
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'account_email' %}">Email</a></li>
+                  <li><a class="dropdown-item" href="{% url 'account_change_password' %}">Password</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="project-side">
+
+        <div id="header" class="container px-4 mt-2">
+            <div class="row gx-3">
+                <div id="project-header" class="col">
+                    <div class="p-3 border bg-light">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="text-decoration-underline"><a href="{% url 'list' %}">My Projects</a></h5>
+                            <a href="{% url 'create' %}" class="btn btn-sm btn-primary" style="color: white;">+ Create</a>
+                        </div>
+                        <hr>
+                        {% for project in request.user.projects.all %}
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6 class="text-decoration-underline"><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h6>
+                                    <div class="d-flex justify-content-between">
+                                        <p>{{ project.task_set.all | length }} Tasks</p>
+                                        {% if project.finish_date %}<p>Finish Date: {{ project.finish_date }}</p>{% endif %}
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-end">
+                                        <p class="text-muted">Created: {{ project.date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-center">At the moment, you haven't created any project</p>
+                        {% endfor %}
+                    </div>
+                </div>
+    
+                <div id="followed-header" class="col">
+                    <div class="p-3 border bg-light">
+                        <h5>Followed Projects</h5>
+                        <hr>
+                        {% for object in request.user.followed_projects.all %}
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h6 class="text-decoration-underline"><a href="{{ object.project.get_absolute_url }}">{{ object.project.title }}</a></h6>
+                                    <div class="d-flex justify-content-between">
+                                        <p>{{ object.project.task_set.all | length }} Tasks</p>
+                                        {% if object.project.finish_date %}<p>Finish Date: {{ object.project.finish_date }}</p>{% endif %}
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="text-muted">{{ object.project.created_by }}</p>
+                                        <p class="text-muted">Created: {{ object.project.date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-center">At the moment, you're not following any project</p> 
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h5 class="mb-3">Projects</h5>
+
+        <div class="container mb-5">
+            {% for project in object_list %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h6 class="text-decoration-underline"><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h6>
+                        <div class="d-flex justify-content-between">
+                            <p>{{ project.task_set.all | length }} Tasks</p>
+                            {% if project.finish_date %}<p>Finish Date: {{ project.finish_date }}</p>{% endif %}
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <p class="text-muted">{{ project.created_by }}</p>
+                            <p class="text-muted">Created: {{ project.date }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center mt-3 mb-3">No projects available at the moment</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+<!--
 <div class="container">
 
     <div class="mt-2 mb-2">
@@ -21,13 +134,15 @@
                 <hr>
                 <p>{{ object.description }}</p>
                 <div class="d-flex justify-content-between">
-                    <p><span class="text-muted">Finish Date:</span>
-                        {% if object.finish_date < today %}
-                            <span class="text-danger">{{ object.finish_date }}</span>
-                        {% else %}
-                            <span>{{ object.finish_date }}</span>
-                        {% endif %}
-                    </p>
+                    {% if object.finish_date %}
+                        <p><span class="text-muted">Finish Date:</span>
+                            {% if object.finish_date < today %}
+                                <span class="text-danger">{{ object.finish_date }}</span>
+                            {% else %}
+                                <span>{{ object.finish_date }}</span>
+                            {% endif %}
+                        </p>
+                    {% endif %}
                     <p class="text-muted">{{ object.task_set.all | length }} Task{{ object.tasks_set | pluralize }}</p>
                 </div>
                 <hr>
@@ -56,4 +171,5 @@
     {% endfor %}
     
 </div>
+-->
 {% endblock content %}

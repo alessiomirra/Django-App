@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect  
+from django.views.generic.base import View 
 from django.views.generic.list import ListView 
 from django.views.generic.detail import DetailView 
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -6,9 +7,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.views.generic.base import TemplateView 
 from django.urls import reverse_lazy 
-from projects.models import Project, Task, Content, Comment 
+from projects.models import Project, Task, Content, Comment, ProjectMembership 
+from django.contrib.auth.models import User 
 from projects.forms import CommentModelForm
 from core.utils import get_current_date
+
 # Create your views here.
 
 class OwnerMixin: 
@@ -59,6 +62,9 @@ class ProjectListView(OwnerProjectMixin, ListView):
     # This generic views give an "object_list" list containing all the objects 
     template_name = 'projects/projects_list.html' 
 
+    def get_queryset(self):
+        return super().get_queryset().order_by("id")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["today"] = get_current_date()
@@ -84,6 +90,9 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["comment_form"] = CommentModelForm()
+        # get project's followers
+        users = User.objects.filter(followed_projects__project = self.get_object())
+        context["followers"] = users 
         return context 
 
     def post(self, request, *args, **kwargs):
@@ -124,6 +133,10 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 class TaskDeleteView(LoginRequiredMixin, DeleteView):
     model = Task 
     template_name = "tasks/task_delete.html"
+
+    def get_success_url(self): 
+        success_url = reverse_lazy("detail", kwargs={"pk":self.object.project.pk})
+        return success_url 
  
 
 #############################################
@@ -194,6 +207,34 @@ class CommentDeleteView(LoginRequiredMixin, DeleteView):
             return super().dispatch(request, *args, **kwargs) 
         except PermissionDenied:
             return redirect("permission_denied")
+
+################################################
+
+############### Enroll in Project Views ##################
+
+class ProjectMembershipView(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("pk")
+        project = Project.objects.get(id = project_id)
+        user = request.user   
+        membership = ProjectMembership.objects.create(
+            project = project, 
+            user = user
+        )
+        return redirect('detail', pk=project_id)
+
+class ProjectMembershipDelete(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("pk")
+        project = Project.objects.get(id = project_id)
+        user = request.user 
+        membership = ProjectMembership.objects.filter(
+            project = project, 
+            user = user, 
+        ) 
+        if membership: 
+            membership.delete()
+        return redirect('detail', pk=project_id)
 
 ################################################
 

@@ -25,6 +25,7 @@ urlpatterns = [
     path("", Homepage.as_view(), name="homepage"), 
     path("", include("projects.urls")), 
     path('accounts/', include('allauth.urls')),
+    path("chat-room/", include("live.urls")), 
 
     path("api/", include("projects.api.urls")), 
 ]
