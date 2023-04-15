@@ -141,6 +141,10 @@ source venv/bin/activate
 pip install -r ./requirements.txt
 ```
 
+This project uses django-allauth and all views require the user's login. Before run the server creare a super user and set up the Google provider required by django-allauth. 
+
+Install and set up Redis both on the your local machine and in the project
+
 Run Django Development Server 
 
 ```python
