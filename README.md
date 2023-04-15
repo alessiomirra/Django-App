@@ -151,14 +151,6 @@ Run Django Development Server
 python manage.py runserver 
 ```
 
-### Possible features
-
-1. Notification System
-It would be a good idea to create a notification system to inform the project's creator when a project is at the 100% progress or when a project is near to the finish_date
-
-2. Chat System 
-Create a Chat Room for each project 
-
 
 
 ##### version 2
