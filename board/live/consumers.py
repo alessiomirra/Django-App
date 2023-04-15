@@ -1,9 +1,11 @@
 import json 
-from channels.generic.websocket import WebsocketConsumer 
+from datetime import datetime 
+from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer 
+from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync 
 
 from projects.models import Project
-from live.models import ChatMessage 
+from live.models import ChatMessage, Notification 
 
 ##### 
 
@@ -43,11 +45,18 @@ class ChatConsumer(WebsocketConsumer):
     def chat_message(self, event):
         message = event["message"]
 
-        new_message = ChatMessage.objects.create(
+        message_exists = ChatMessage.objects.filter(
             user = self.scope["user"], 
             project = self.project, 
-            message = message
-        )
+            message = message 
+        ).exists()
+
+        if not message_exists:
+            new_message = ChatMessage.objects.create(
+                user = self.scope["user"], 
+                project = self.project, 
+                message = message
+            )
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
@@ -55,3 +64,59 @@ class ChatConsumer(WebsocketConsumer):
             "user": new_message.user.username, 
             "date": new_message.date.isoformat(),
         }))
+
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add(
+            'notifications', self.channel_name
+        )
+        await self.accept()
+        notifications = await self.get_notifications()
+        for i in notifications: 
+            date = i["date"].strftime('%Y-%m-%d %H:%M')
+            await self.send(text_data = json.dumps({
+                "message": i["message"], 
+                "date": date,
+                "project_id": i["project_id"]
+            }))
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            'notifications', self.channel_name 
+        )
+    
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+        project = text_data_json["project"]
+        user = text_data_json["user"]
+        await self.channel_layer.group_send(
+            'notifications', 
+            {
+                'type': 'send_notifications', 
+                'message': message,
+                'project': project, 
+                'user': user,  
+            }
+        )
+    
+    async def send_notification(self, event):
+        message = event["message"]
+        now = datetime.now()
+        await self.send(text_data=json.dumps({
+            'message': message, 
+            'date': now.isoformat(),
+        }))
+
+    @database_sync_to_async
+    def get_notifications(self):
+        return list(Notification.objects.exclude(user = self.scope["user"]).values().order_by("-id"))
+
+    @database_sync_to_async
+    def create_notification(self, message, project, user):
+        return Notification.objects.create(
+            message = message, 
+            project = project, 
+            user = user, 
+        )
+

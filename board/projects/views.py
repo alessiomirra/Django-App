@@ -12,6 +12,10 @@ from django.contrib.auth.models import User
 from projects.forms import CommentModelForm
 from core.utils import get_current_date
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from live.models import Notification  
+
 # Create your views here.
 
 class OwnerMixin: 
@@ -106,7 +110,28 @@ class ProjectDetailView(DetailView):
         return self.get(request, *args, **kwargs)
 
 class ProjectCreateView(OwnerProjectEditMixin, CreateView):
-    pass 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        # send notification
+        channel_layer = get_channel_layer()
+        message = f"{self.request.user} has created a new project: '{self.object.title}'. Check project's list!"
+        async_to_sync(channel_layer.group_send)(
+            'notifications', 
+            {
+                "type": "send_notification", 
+                "message": message,
+            }   
+        )
+
+        # create the new Notification 
+        new_notification = Notification.objects.create(
+            project = self.object, 
+            message = message, 
+            user = self.request.user 
+        )
+
+        return response 
 
 class ProjectUpdtateView(OwnerProjectEditMixin, UpdateView):
     pass 

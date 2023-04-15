@@ -12,3 +12,12 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"{self.user.username} message for {self.project.title} 's chat room"
 
+
+class Notification(models.Model):
+    message = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.pk}: {self.project.title} notification"
