@@ -5,7 +5,7 @@ The application has the following functionality:
 - User authentication using an external Oauth2-OpenID provider 
 - CRUD Project API 
 - CRUD Task API 
-- Extras functionality
+- Extras functionalities
 
 ## 1. User Authentication 
 
